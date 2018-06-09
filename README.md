@@ -467,3 +467,104 @@ One more for directive :
       });
     });
 
+# Component with form
+
+    import {TestBed, async, ComponentFixture} from '@angular/core/testing';
+    import {By} from '@angular/platform-browser';
+    import {DebugElement} from '@angular/core';
+    import {SectionComponent} from './section.component';
+    import {FormsModule} from '@angular/forms';
+
+    describe('Component: SectionComponent', () => {
+        let fixture: ComponentFixture<SectionComponent>;
+        let sectionComponent: SectionComponent;
+        let element: any;
+        let debugElement: DebugElement;
+
+        // setup
+        beforeEach(() => {
+            TestBed.configureTestingModule({
+                imports: [FormsModule],
+                declarations: [SectionComponent]
+            });
+
+            fixture = TestBed.createComponent(SectionComponent);
+            sectionComponent = fixture.componentInstance;
+            element = fixture.nativeElement;
+            debugElement = fixture.debugElement;
+        });
+
+        afterEach(() => {
+            if (fixture) {
+                fixture.destroy();
+            }
+        });
+
+        // specs
+        it('should render `James Bond`', async(() => {
+            sectionComponent.username = 'James Bond';
+
+            // trigger change detection
+            fixture.detectChanges();
+
+            // wait until fixture is stable and check then the name
+            fixture.whenStable().then(() => {
+                // first approach
+                expect(element.querySelector('input[name=username]').value).toBe('James Bond');
+                // second approach
+                expect(debugElement.query(By.css('input[name=username]')).nativeElement.value).toBe('James Bond');
+            });
+        }));
+    });
+
+
+# Template for service and uses mockbackend for http
+
+    import {TestBed, inject} from '@angular/core/testing';
+    import {HttpModule, XHRBackend, Response, ResponseOptions} from '@angular/http';
+    import {MockBackend, MockConnection} from '@angular/http/testing';
+    import {CountryService} from './country.service';
+    import Country from './country';
+
+    describe('CountryService (MockBackend)', () => {
+        let mockbackend: MockBackend, service: CountryService;
+
+        // setup
+        beforeEach(() => {
+            TestBed.configureTestingModule({
+                imports: [HttpModule],
+                providers: [
+                    CountryService,
+                    MockBackend,
+                    {provide: XHRBackend, useClass: MockBackend}
+                ]
+            })
+        });
+
+        beforeEach(inject([CountryService, MockBackend], (cs: CountryService, mb: MockBackend) => {
+            service = cs;
+            mockbackend = mb;
+        }));
+
+        // specs
+        it('should return mocked response', () => {
+            let israel: Country = {'name': 'Israel', 'dial_code': '+972', 'code': 'IL'};
+            let angola: Country = {'name': 'Angola', 'dial_code': '+244', 'code': 'AO'};
+            let response = [israel, angola];
+
+            mockbackend.connections.subscribe((connection: MockConnection) => {
+                connection.mockRespond(new Response(new ResponseOptions({
+                    status: 200,
+                    body: JSON.stringify(response)
+                })));
+            });
+
+            service.getCountries().subscribe(countries => {
+                expect(countries.length).toBe(2);
+                expect(countries).toContain(israel);
+                expect(countries).toContain(angola);
+            });
+        });
+    });
+
+
