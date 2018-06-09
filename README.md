@@ -1,7 +1,7 @@
 # angular-details
 angular-unittesting
 
-{code }
+{
 
 import { FetchDataComponent } from './fetchdata.component';
 import { Http } from '@angular/http';
@@ -39,4 +39,4 @@ describe('fetchdata', () => {
     });
 });
 
-{code }
+}
