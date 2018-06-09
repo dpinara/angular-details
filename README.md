@@ -290,7 +290,6 @@ angular-unittesting
 
 # Template to test directive
 
-/* tslint:disable:no-unused-variable */
   import { async, ComponentFixture, TestBed } from '@angular/core/testing';
   import { HighlightDirective } from './highlight.directive';
   import { By } from '@angular/platform-browser';
@@ -311,7 +310,7 @@ angular-unittesting
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         declarations: [ DirectiveHostComponent, HighlightDirective ]
-      })
+      })    
       .compileComponents();
     }));
   
